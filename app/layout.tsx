@@ -1,6 +1,7 @@
+import Header from "@/components/header/Header";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "./style/style.scss";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +19,9 @@ export default function RootLayout({
     <html lang="en">
       <body
         data-theme={"dark"}
-        className={`bg-gradient-to-r from-[#070711] to-[#031024] text-white ${inter.className}`}
+        className={`bg-gradient-to-r min-h-screen from-[#131a27] to-[#091324] text-white ${inter.className}`}
       >
+        <Header />
         {children}
       </body>
     </html>

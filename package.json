@@ -9,16 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@babel/standalone": "^7.24.6",
     "@codemirror/lang-html": "^6.4.9",
     "@monaco-editor/react": "^4.6.0",
+    "@types/babel__standalone": "^7.1.7",
+    "@types/htmltojsx": "^0.0.33",
     "@uiw/codemirror-theme-material": "^4.22.1",
     "@uiw/react-codemirror": "^4.22.1",
     "codemirror": "^6.0.1",
     "daisyui": "^4.11.1",
+    "domhandler": "^5.0.3",
+    "html-react-parser": "^5.1.10",
+    "html-to-jsx": "^0.0.4",
+    "htmlparser2": "^9.1.0",
+    "htmltojsx": "^0.3.0",
+    "jsx-to-html": "^1.1.0",
+    "monaco-editor": "^0.49.0",
     "next": "14.2.3",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-icons": "^5.2.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.2.1",
+    "sass": "^1.77.2"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",

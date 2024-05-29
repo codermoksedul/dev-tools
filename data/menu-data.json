@@ -1,0 +1,19 @@
+[
+  {
+    "label": "Minify HTML",
+    "url": "/"
+  },
+  {
+    "label": "Minify CSS",
+    "url": "/minify-css"
+  },
+  { "label": "Minify JS", "url": "/minify-js" },
+  {
+    "label": "Text Analyzer",
+    "url": "/text-analyzer"
+  },
+  {
+    "label": "Space Remover",
+    "url": "/space-remover"
+  }
+]

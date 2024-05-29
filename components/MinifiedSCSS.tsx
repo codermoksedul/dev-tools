@@ -11,25 +11,26 @@ import {
   FaMagic,
   FaTimes,
 } from "react-icons/fa";
-import { TbBrandHtml5 } from "react-icons/tb";
+import { TbBrandSass } from "react-icons/tb";
 
-function minifyHTML(html: string): string {
-  return html.replace(/\s+/g, " ").trim();
-}
-
-function beautifyHTML(html: string): string {
-  const beautifiedHtml = html
-    .replace(/>\s*</g, ">\n<")
-    .replace(/\s{2,}/g, " ")
-    .replace(/<([^>]+)>/g, (match, p1) => `<${p1.trim()}>`)
-    .replace(/\n\s+/g, "\n")
+function minifySCSS(scss: string): string {
+  return scss
+    .replace(/\s+/g, " ")
+    .replace(/\s*([{};:,])\s*/g, "$1")
     .trim();
-  return beautifiedHtml;
 }
 
-const MinifiedHTML: React.FC = () => {
-  const [htmlContent, setHtmlContent] = useState<string>("");
-  const [outputHtml, setOutputHtml] = useState<string>("");
+function beautifySCSS(scss: string): string {
+  const beautifiedScss = scss
+    .replace(/({|;)([^{};])/g, "$1\n  $2")
+    .replace(/}/g, "}\n")
+    .trim();
+  return beautifiedScss;
+}
+
+const MinifiedSCSS: React.FC = () => {
+  const [scssContent, setScssContent] = useState<string>("");
+  const [outputScss, setOutputScss] = useState<string>("");
   const [isMinified, setIsMinified] = useState<boolean>(true);
   const [url, setUrl] = useState<string>("");
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
@@ -37,8 +38,8 @@ const MinifiedHTML: React.FC = () => {
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
-      setHtmlContent(value);
-      setOutputHtml(isMinified ? minifyHTML(value) : beautifyHTML(value));
+      setScssContent(value);
+      setOutputScss(isMinified ? minifySCSS(value) : beautifySCSS(value));
     }
   };
 
@@ -48,9 +49,9 @@ const MinifiedHTML: React.FC = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const fileContent = e.target?.result as string;
-        setHtmlContent(fileContent);
-        setOutputHtml(
-          isMinified ? minifyHTML(fileContent) : beautifyHTML(fileContent)
+        setScssContent(fileContent);
+        setOutputScss(
+          isMinified ? minifySCSS(fileContent) : beautifySCSS(fileContent)
         );
       };
       reader.readAsText(file);
@@ -58,23 +59,23 @@ const MinifiedHTML: React.FC = () => {
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(outputHtml).then(() => {
-      alert("Minified HTML copied to clipboard!");
+    navigator.clipboard.writeText(outputScss).then(() => {
+      alert("Minified SCSS copied to clipboard!");
     });
   };
 
   const toggleMinifyBeautify = () => {
     setIsMinified(!isMinified);
-    setOutputHtml(
-      isMinified ? beautifyHTML(htmlContent) : minifyHTML(htmlContent)
+    setOutputScss(
+      isMinified ? beautifySCSS(scssContent) : minifySCSS(scssContent)
     );
   };
 
   const handleDownload = () => {
-    const blob = new Blob([outputHtml], { type: "text/html" });
+    const blob = new Blob([outputScss], { type: "text/x-scss" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "output.html";
+    link.download = "output.scss";
     link.click();
     URL.revokeObjectURL(link.href);
   };
@@ -83,21 +84,21 @@ const MinifiedHTML: React.FC = () => {
     setUrl(event.target.value);
   };
 
-  const fetchHtmlFromUrl = async () => {
+  const fetchScssFromUrl = async () => {
     try {
       const response = await fetch(url);
       if (response.ok) {
-        const fetchedHtml = await response.text();
-        setHtmlContent(fetchedHtml);
-        setOutputHtml(
-          isMinified ? minifyHTML(fetchedHtml) : beautifyHTML(fetchedHtml)
+        const fetchedScss = await response.text();
+        setScssContent(fetchedScss);
+        setOutputScss(
+          isMinified ? minifySCSS(fetchedScss) : beautifySCSS(fetchedScss)
         );
         setPopup(false); // Close the popup after fetching URL
       } else {
-        alert("Failed to fetch HTML from the provided URL.");
+        alert("Failed to fetch SCSS from the provided URL.");
       }
     } catch (error) {
-      alert("An error occurred while fetching the HTML.");
+      alert("An error occurred while fetching the SCSS.");
     }
   };
 
@@ -116,19 +117,19 @@ const MinifiedHTML: React.FC = () => {
   };
 
   const handleCut = () => {
-    setOutputHtml("");
+    setOutputScss("");
   };
 
   const handleClean = () => {
-    setOutputHtml(outputHtml.trim());
+    setOutputScss(outputScss.trim());
   };
 
   return (
     <>
-      <div className="w-full flex flex-col justify-center items-center p-5">
+      <div className="w-full  flex flex-col justify-center items-center p-5">
         <div className="container mx-auto p-4">
           <h1 className="text-3xl font-bold text-center mb-6">
-            HTML Minifier & Beautifier
+            SCSS Minifier & Beautifier
           </h1>
           <div className="flex justify-center my-8">
             <button
@@ -138,12 +139,12 @@ const MinifiedHTML: React.FC = () => {
               {isMinified ? (
                 <>
                   <FaMagic className="mr-2" />
-                  Beautify HTML
+                  Beautify SCSS
                 </>
               ) : (
                 <>
                   <FaCompress className="mr-2" />
-                  Minify HTML
+                  Minify SCSS
                 </>
               )}
             </button>
@@ -153,12 +154,12 @@ const MinifiedHTML: React.FC = () => {
               <div className="heading p-2">
                 <div className="flex flex-row justify-start items-center gap-5">
                   <label className="btn_design" htmlFor="file">
-                    <TbBrandHtml5 className="mr-2" />
+                    <TbBrandSass className="mr-2" />
                     File
                     <input
                       type="file"
                       id="file"
-                      accept=".html"
+                      accept=".scss"
                       onChange={handleFileUpload}
                       className="hidden"
                     />
@@ -172,9 +173,9 @@ const MinifiedHTML: React.FC = () => {
               <div className="">
                 <Editor
                   height="500px"
-                  defaultLanguage="html"
+                  defaultLanguage="scss"
                   theme="vs-dark"
-                  value={htmlContent}
+                  value={scssContent}
                   onChange={handleEditorChange}
                   options={{
                     wordWrap: "on",
@@ -198,7 +199,7 @@ const MinifiedHTML: React.FC = () => {
                   <button
                     onClick={handleCopy}
                     className="btn_design"
-                    disabled={!outputHtml}
+                    disabled={!outputScss}
                   >
                     <FaCopy className="mr-2" />
                     Copy
@@ -206,7 +207,7 @@ const MinifiedHTML: React.FC = () => {
                   <button
                     onClick={handleCut}
                     className="btn_design"
-                    disabled={!outputHtml}
+                    disabled={!outputScss}
                   >
                     <FaCut className="mr-2" />
                     Cut
@@ -214,7 +215,7 @@ const MinifiedHTML: React.FC = () => {
                   <button
                     onClick={handleClean}
                     className="btn_design"
-                    disabled={!outputHtml}
+                    disabled={!outputScss}
                   >
                     <FaBroom className="mr-2" />
                     Clean
@@ -222,7 +223,7 @@ const MinifiedHTML: React.FC = () => {
                   <button
                     onClick={handleDownload}
                     className="btn_design"
-                    disabled={!outputHtml}
+                    disabled={!outputScss}
                   >
                     <FaDownload className="mr-2" />
                     Download
@@ -232,9 +233,9 @@ const MinifiedHTML: React.FC = () => {
               <div className="">
                 <Editor
                   height="500px"
-                  defaultLanguage="html"
+                  defaultLanguage="scss"
                   theme="vs-dark"
-                  value={outputHtml}
+                  value={outputScss}
                   options={{
                     readOnly: true,
                     wordWrap: "on",
@@ -260,7 +261,7 @@ const MinifiedHTML: React.FC = () => {
           <div className="popup_content">
             <div className="flex flex-col justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
-                {showUrlInput ? "Fetch HTML from URL" : "Upload HTML File"}
+                {showUrlInput ? "Fetch SCSS from URL" : "Upload SCSS File"}
               </h2>
               <button
                 onClick={handleClosePopup}
@@ -276,11 +277,11 @@ const MinifiedHTML: React.FC = () => {
                   className="input w-full input-bordered"
                   value={url}
                   onChange={handleUrlChange}
-                  placeholder="Enter URL to fetch HTML"
+                  placeholder="Enter URL to fetch SCSS"
                 />
-                <button onClick={fetchHtmlFromUrl} className="btn btn-primary">
+                <button onClick={fetchScssFromUrl} className="btn btn-primary">
                   <FaLink className="mr-2" />
-                  Fetch HTML
+                  Fetch SCSS
                 </button>
               </div>
             ) : null}
@@ -291,4 +292,4 @@ const MinifiedHTML: React.FC = () => {
   );
 };
 
-export default MinifiedHTML;
+export default MinifiedSCSS;

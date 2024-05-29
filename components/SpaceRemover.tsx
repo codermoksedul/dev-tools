@@ -3,42 +3,29 @@ import Editor from "@monaco-editor/react";
 import { useState } from "react";
 import {
   FaBroom,
-  FaCompress,
   FaCopy,
   FaCut,
   FaDownload,
   FaLink,
-  FaMagic,
   FaTimes,
 } from "react-icons/fa";
-import { TbBrandHtml5 } from "react-icons/tb";
+import { TbBrandSass } from "react-icons/tb";
 
-function minifyHTML(html: string): string {
-  return html.replace(/\s+/g, " ").trim();
+function removeSpaces(content: string): string {
+  return content.replace(/\s+/g, " ").trim();
 }
 
-function beautifyHTML(html: string): string {
-  const beautifiedHtml = html
-    .replace(/>\s*</g, ">\n<")
-    .replace(/\s{2,}/g, " ")
-    .replace(/<([^>]+)>/g, (match, p1) => `<${p1.trim()}>`)
-    .replace(/\n\s+/g, "\n")
-    .trim();
-  return beautifiedHtml;
-}
-
-const MinifiedHTML: React.FC = () => {
-  const [htmlContent, setHtmlContent] = useState<string>("");
-  const [outputHtml, setOutputHtml] = useState<string>("");
-  const [isMinified, setIsMinified] = useState<boolean>(true);
+const SpaceRemover: React.FC = () => {
+  const [inputContent, setInputContent] = useState<string>("");
+  const [outputContent, setOutputContent] = useState<string>("");
   const [url, setUrl] = useState<string>("");
   const [showUrlInput, setShowUrlInput] = useState<boolean>(false);
   const [popup, setPopup] = useState<boolean>(false);
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
-      setHtmlContent(value);
-      setOutputHtml(isMinified ? minifyHTML(value) : beautifyHTML(value));
+      setInputContent(value);
+      setOutputContent(removeSpaces(value));
     }
   };
 
@@ -48,33 +35,24 @@ const MinifiedHTML: React.FC = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const fileContent = e.target?.result as string;
-        setHtmlContent(fileContent);
-        setOutputHtml(
-          isMinified ? minifyHTML(fileContent) : beautifyHTML(fileContent)
-        );
+        setInputContent(fileContent);
+        setOutputContent(removeSpaces(fileContent));
       };
       reader.readAsText(file);
     }
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(outputHtml).then(() => {
-      alert("Minified HTML copied to clipboard!");
+    navigator.clipboard.writeText(outputContent).then(() => {
+      alert("Output content copied to clipboard!");
     });
   };
 
-  const toggleMinifyBeautify = () => {
-    setIsMinified(!isMinified);
-    setOutputHtml(
-      isMinified ? beautifyHTML(htmlContent) : minifyHTML(htmlContent)
-    );
-  };
-
   const handleDownload = () => {
-    const blob = new Blob([outputHtml], { type: "text/html" });
+    const blob = new Blob([outputContent], { type: "text/plain" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "output.html";
+    link.download = "output.txt";
     link.click();
     URL.revokeObjectURL(link.href);
   };
@@ -83,21 +61,19 @@ const MinifiedHTML: React.FC = () => {
     setUrl(event.target.value);
   };
 
-  const fetchHtmlFromUrl = async () => {
+  const fetchContentFromUrl = async () => {
     try {
       const response = await fetch(url);
       if (response.ok) {
-        const fetchedHtml = await response.text();
-        setHtmlContent(fetchedHtml);
-        setOutputHtml(
-          isMinified ? minifyHTML(fetchedHtml) : beautifyHTML(fetchedHtml)
-        );
+        const fetchedContent = await response.text();
+        setInputContent(fetchedContent);
+        setOutputContent(removeSpaces(fetchedContent));
         setPopup(false); // Close the popup after fetching URL
       } else {
-        alert("Failed to fetch HTML from the provided URL.");
+        alert("Failed to fetch content from the provided URL.");
       }
     } catch (error) {
-      alert("An error occurred while fetching the HTML.");
+      alert("An error occurred while fetching the content.");
     }
   };
 
@@ -116,49 +92,29 @@ const MinifiedHTML: React.FC = () => {
   };
 
   const handleCut = () => {
-    setOutputHtml("");
+    setOutputContent("");
   };
 
   const handleClean = () => {
-    setOutputHtml(outputHtml.trim());
+    setOutputContent(outputContent.trim());
   };
 
   return (
     <>
-      <div className="w-full flex flex-col justify-center items-center p-5">
+      <div className="w-full  flex flex-col justify-center items-center p-5">
         <div className="container mx-auto p-4">
-          <h1 className="text-3xl font-bold text-center mb-6">
-            HTML Minifier & Beautifier
-          </h1>
-          <div className="flex justify-center my-8">
-            <button
-              onClick={toggleMinifyBeautify}
-              className="btn btn-outline border-slate-700"
-            >
-              {isMinified ? (
-                <>
-                  <FaMagic className="mr-2" />
-                  Beautify HTML
-                </>
-              ) : (
-                <>
-                  <FaCompress className="mr-2" />
-                  Minify HTML
-                </>
-              )}
-            </button>
-          </div>
+          <h1 className="text-3xl font-bold text-center mb-6">Space Remover</h1>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <div className="inputBox editorBox">
               <div className="heading p-2">
                 <div className="flex flex-row justify-start items-center gap-5">
                   <label className="btn_design" htmlFor="file">
-                    <TbBrandHtml5 className="mr-2" />
+                    <TbBrandSass className="mr-2" />
                     File
                     <input
                       type="file"
                       id="file"
-                      accept=".html"
+                      accept=".scss,.css,.html,.js,.txt"
                       onChange={handleFileUpload}
                       className="hidden"
                     />
@@ -172,9 +128,9 @@ const MinifiedHTML: React.FC = () => {
               <div className="">
                 <Editor
                   height="500px"
-                  defaultLanguage="html"
+                  defaultLanguage="text"
                   theme="vs-dark"
-                  value={htmlContent}
+                  value={inputContent}
                   onChange={handleEditorChange}
                   options={{
                     wordWrap: "on",
@@ -198,7 +154,7 @@ const MinifiedHTML: React.FC = () => {
                   <button
                     onClick={handleCopy}
                     className="btn_design"
-                    disabled={!outputHtml}
+                    disabled={!outputContent}
                   >
                     <FaCopy className="mr-2" />
                     Copy
@@ -206,7 +162,7 @@ const MinifiedHTML: React.FC = () => {
                   <button
                     onClick={handleCut}
                     className="btn_design"
-                    disabled={!outputHtml}
+                    disabled={!outputContent}
                   >
                     <FaCut className="mr-2" />
                     Cut
@@ -214,7 +170,7 @@ const MinifiedHTML: React.FC = () => {
                   <button
                     onClick={handleClean}
                     className="btn_design"
-                    disabled={!outputHtml}
+                    disabled={!outputContent}
                   >
                     <FaBroom className="mr-2" />
                     Clean
@@ -222,7 +178,7 @@ const MinifiedHTML: React.FC = () => {
                   <button
                     onClick={handleDownload}
                     className="btn_design"
-                    disabled={!outputHtml}
+                    disabled={!outputContent}
                   >
                     <FaDownload className="mr-2" />
                     Download
@@ -232,9 +188,9 @@ const MinifiedHTML: React.FC = () => {
               <div className="">
                 <Editor
                   height="500px"
-                  defaultLanguage="html"
+                  defaultLanguage="text"
                   theme="vs-dark"
-                  value={outputHtml}
+                  value={outputContent}
                   options={{
                     readOnly: true,
                     wordWrap: "on",
@@ -260,7 +216,7 @@ const MinifiedHTML: React.FC = () => {
           <div className="popup_content">
             <div className="flex flex-col justify-between items-center mb-4">
               <h2 className="text-xl font-bold">
-                {showUrlInput ? "Fetch HTML from URL" : "Upload HTML File"}
+                {showUrlInput ? "Fetch Content from URL" : "Upload File"}
               </h2>
               <button
                 onClick={handleClosePopup}
@@ -276,11 +232,14 @@ const MinifiedHTML: React.FC = () => {
                   className="input w-full input-bordered"
                   value={url}
                   onChange={handleUrlChange}
-                  placeholder="Enter URL to fetch HTML"
+                  placeholder="Enter URL to fetch content"
                 />
-                <button onClick={fetchHtmlFromUrl} className="btn btn-primary">
+                <button
+                  onClick={fetchContentFromUrl}
+                  className="btn btn-primary"
+                >
                   <FaLink className="mr-2" />
-                  Fetch HTML
+                  Fetch Content
                 </button>
               </div>
             ) : null}
@@ -291,4 +250,4 @@ const MinifiedHTML: React.FC = () => {
   );
 };
 
-export default MinifiedHTML;
+export default SpaceRemover;

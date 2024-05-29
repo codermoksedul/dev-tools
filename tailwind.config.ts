@@ -23,10 +23,10 @@ const config: Config = {
     },
     extend: {
       colors: {
-        "primary-color": "#05744e",
-        "bg-primary": "#05744e",
-        "text-primary": "#05744e",
-        "link-primary": "#05744e",
+        "primary-color": "#4F46E5",
+        "bg-primary": "#4F46E5",
+        "text-primary": "#4F46E5",
+        "link-primary": "#4F46E5",
         "secondary-color": "#DF072B",
       },
       backgroundImage: {
